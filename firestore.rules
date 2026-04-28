@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        (request.auth.token.email == 'progressphilemon@gmail.com' && request.auth.token.email_verified == true);
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Collection Rules ---
+
+    // USERS
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.keys().hasAll(['uid', 'email', 'role', 'createdAt']) &&
+               data.keys().size() <= 6 &&
+               data.uid == request.auth.uid &&
+               data.email is string && data.email.size() <= 256 &&
+               data.role in ['admin', 'user'] &&
+               data.createdAt is timestamp;
+      }
+
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().role == 'user';
+      allow update: if isOwner(userId) && isValidUser(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']) || 
+                    isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // POSTS
+    match /posts/{postId} {
+      function isValidPost(data) {
+        return data.keys().hasAll(['title', 'slug', 'content', 'authorId', 'published', 'createdAt']) &&
+               data.title is string && data.title.size() <= 200 &&
+               data.slug is string && data.slug.size() <= 200 &&
+               data.content is string && data.content.size() <= 100000 &&
+               data.authorId == request.auth.uid &&
+               data.published is bool &&
+               data.createdAt is timestamp;
+      }
+
+      allow read: if incoming().published == true || isAdmin() || (isSignedIn() && existing().published == true);
+      allow list: if (resource.data.published == true) || isAdmin();
+      allow create: if isAdmin() && isValidPost(incoming());
+      allow update: if isAdmin() && (
+        incoming().diff(existing()).affectedKeys().hasAny(['title', 'content', 'published', 'updatedAt']) &&
+        incoming().updatedAt == request.time
+      );
+      allow delete: if isAdmin();
+    }
+
+    // BOOKS
+    match /books/{bookId} {
+      function isValidBook(data) {
+        return data.keys().hasAll(['title', 'description', 'price', 'published', 'createdAt']) &&
+               data.title is string && data.title.size() <= 200 &&
+               data.description is string && data.description.size() <= 2000 &&
+               data.price is number && data.price >= 0 &&
+               data.published is bool &&
+               data.createdAt is timestamp;
+      }
+
+      allow read: if existing().published == true || isAdmin();
+      allow list: if resource.data.published == true || isAdmin();
+      allow create: if isAdmin() && isValidBook(incoming());
+      allow update: if isAdmin() && isValidBook(incoming());
+      allow delete: if isAdmin();
+    }
+  }
+}
