@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
+import { syncUserProfile } from './services';
 
 interface AuthContextType {
   user: User | null;
@@ -18,10 +19,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser);
+      if (authUser) {
+        syncUserProfile(authUser);
+      }
       // Simple client-side admin check based on email provided in prompt
-      setIsAdmin(user?.email === 'progressphilemon@gmail.com');
+      setIsAdmin(authUser?.email === 'progressphilemon@gmail.com');
       setLoading(false);
     });
 

@@ -10,10 +10,45 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  setDoc,
   Timestamp,
   serverTimestamp 
 } from 'firebase/firestore';
+import { User } from 'firebase/auth';
 import { db, handleFirestoreError, OperationType } from './firebase';
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL: string;
+  role: 'admin' | 'user';
+  createdAt: Date;
+}
+
+// --- Users ---
+
+export const syncUserProfile = async (user: User) => {
+  const path = `users/${user.uid}`;
+  const userDocRef = doc(db, 'users', user.uid);
+  try {
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || '',
+        photoURL: user.photoURL || '',
+        role: user.email === 'progressphilemon@gmail.com' ? 'admin' : 'user',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+};
+
 
 export interface Post {
   id?: string;
