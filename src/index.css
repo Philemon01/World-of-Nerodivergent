@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-primary: #026ca3;
+  --color-brand-secondary: #f0f9ff;
+  --color-brand-dark: #0f172a;
+  
+  /* Rainbow Palette */
+  --color-rainbow-red: #ef4444;
+  --color-rainbow-orange: #f97316;
+  --color-rainbow-yellow: #facc15;
+  --color-rainbow-green: #22c55e;
+  --color-rainbow-blue: #3b82f6;
+  --color-rainbow-indigo: #6366f1;
+  --color-rainbow-violet: #a855f7;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-white text-slate-900 antialiased;
+  }
+}
+
+@layer utilities {
+  .bg-rainbow-gradient {
+    background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #22c55e, #3b82f6, #6366f1, #a855f7);
+  }
+  .text-rainbow-gradient {
+    background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #22c55e, #3b82f6, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.neuro-focus-ring:focus-visible {
+  @apply outline-none ring-4 ring-brand-primary ring-offset-2;
+}
