@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Settings, ShoppingBag } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, X, LayoutDashboard, ShoppingBag } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthButton from './AuthButton';
 import { useAuth } from '../lib/AuthContext';
-import AdminDashboard from './AdminDashboard';
 import AccessibilityPanel from './AccessibilityPanel';
 
 export default function Navigation() {
@@ -22,12 +21,12 @@ export default function Navigation() {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '#hero' },
-    { name: 'Insights', href: '#blog' },
-    { name: 'Books', href: '#books' },
-    { name: 'Resources', href: '#resources' },
-    { name: 'Principles', href: '#rules' },
-    { name: 'About', href: '#founder' },
+    { name: 'Home', href: '/' },
+    { name: 'Insights', href: '/#blog' },
+    { name: 'Books', href: '/#books' },
+    { name: 'Resources', href: '/#resources' },
+    { name: 'Principles', href: '/#rules' },
+    { name: 'About', href: '/#founder' },
   ];
 
   return (
@@ -62,13 +61,13 @@ export default function Navigation() {
               ))}
               
               {isAdmin && (
-                <button 
-                  onClick={() => setIsAdminPanelOpen(true)}
+                <Link 
+                  to="/admin"
                   className="flex items-center gap-2 text-rainbow-blue font-black hover:text-rainbow-orange transition-colors"
                 >
-                  <Settings size={18} />
-                  Admin Panel
-                </button>
+                  <LayoutDashboard size={18} />
+                  Admin
+                </Link>
               )}
 
               {user && (
@@ -118,16 +117,14 @@ export default function Navigation() {
                   ))}
                   
                   {isAdmin && (
-                    <button 
-                      onClick={() => {
-                        setIsAdminPanelOpen(true);
-                        setIsMobileMenuOpen(false);
-                      }}
+                    <Link 
+                      to="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="text-2xl font-black text-rainbow-blue flex items-center gap-2"
                     >
-                      <Settings size={22} />
-                      Dashboard
-                    </button>
+                      <LayoutDashboard size={22} />
+                      Admin Panel
+                    </Link>
                   )}
 
                   <div className="pt-4 border-t border-slate-100">
@@ -139,8 +136,6 @@ export default function Navigation() {
           </AnimatePresence>
         </nav>
       </div>
-
-      <AdminDashboard isOpen={isAdminPanelOpen} onClose={() => setIsAdminPanelOpen(false)} />
     </>
   );
 }
