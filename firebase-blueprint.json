@@ -9,7 +9,7 @@
         "email": { "type": "string" },
         "displayName": { "type": "string" },
         "photoURL": { "type": "string" },
-        "role": { "type": "string", "enum": ["admin", "user"] },
+        "role": { "type": "string", "enum": ["admin", "moderator", "content_creator", "user"] },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
@@ -50,6 +50,21 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "description", "price", "published", "createdAt"]
+    },
+    "Resource": {
+      "title": "Downloadable Resource",
+      "description": "Guides, checklists, and PDFs for the community.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["pdf", "guide", "checklist", "infographic"] },
+        "fileUrl": { "type": "string" },
+        "isFree": { "type": "boolean" },
+        "published": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "fileUrl", "published", "createdAt"]
     }
   },
   "firestore": {
@@ -64,6 +79,14 @@
     "/books/{bookId}": {
       "schema": "Book",
       "description": "Books for sale."
+    },
+    "/resources/{resourceId}": {
+      "schema": "Resource",
+      "description": "Community resources."
+    },
+    "/purchases/{purchaseId}": {
+      "schema": "Purchase",
+      "description": "User purchase history."
     }
   }
 }

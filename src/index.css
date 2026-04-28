@@ -37,3 +37,44 @@
 .neuro-focus-ring:focus-visible {
   @apply outline-none ring-4 ring-brand-primary ring-offset-2;
 }
+
+/* Accessibility Modes */
+.acc-high-contrast {
+  --color-brand-primary: #000000;
+  --color-brand-secondary: #ffffff;
+  --color-brand-dark: #000000;
+  --color-rainbow-blue: #0000ff;
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
+.acc-high-contrast section, .acc-high-contrast nav {
+  background-color: #fff !important;
+  border-bottom: 2px solid #000 !important;
+}
+
+.acc-high-contrast p, .acc-high-contrast span {
+  color: #000 !important;
+  font-weight: 500 !important;
+}
+
+.acc-high-contrast .bg-rainbow-gradient {
+  background: #000 !important;
+}
+
+.acc-dyslexic-font {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+  line-height: 1.8 !important;
+}
+
+.acc-reduced-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://antijingoist.github.io/opendyslexic/fonts/OpenDyslexic-Regular.otf');
+}

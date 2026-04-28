@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Settings } from 'lucide-react';
+import { Menu, X, Settings, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import AuthButton from './AuthButton';
 import { useAuth } from '../lib/AuthContext';
 import AdminDashboard from './AdminDashboard';
+import AccessibilityPanel from './AccessibilityPanel';
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,10 +23,11 @@ export default function Navigation() {
 
   const navLinks = [
     { name: 'Home', href: '#hero' },
-    { name: 'Principles', href: '#rules' },
-    { name: 'Founder', href: '#founder' },
+    { name: 'Insights', href: '#blog' },
     { name: 'Books', href: '#books' },
-    { name: 'Blog', href: '#blog' },
+    { name: 'Resources', href: '#resources' },
+    { name: 'Principles', href: '#rules' },
+    { name: 'About', href: '#founder' },
   ];
 
   return (
@@ -68,7 +71,20 @@ export default function Navigation() {
                 </button>
               )}
 
-              <AuthButton />
+              {user && (
+                <Link 
+                  to="/dashboard"
+                  className="flex items-center gap-2 text-brand-dark font-black hover:text-rainbow-blue transition-colors group/dash"
+                >
+                  <ShoppingBag size={18} className="group-hover:scale-110 transition-transform" />
+                  My Library
+                </Link>
+              )}
+
+              <div className="flex items-center gap-2">
+                <AccessibilityPanel />
+                <AuthButton />
+              </div>
             </div>
 
             {/* Mobile Toggle */}

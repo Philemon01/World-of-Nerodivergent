@@ -15,11 +15,23 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function isAdmin() {
       return isSignedIn() && 
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-        (request.auth.token.email == 'progressphilemon@gmail.com' && request.auth.token.email_verified == true);
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         getUserData().role == 'admin') ||
+        (request.auth.token.email == 'progressphilemon@gmail.com' && request.auth.token.email_verified == true));
+    }
+
+    function isModerator() {
+      return isSignedIn() && (isAdmin() || getUserData().role == 'moderator');
+    }
+
+    function isContentCreator() {
+      return isSignedIn() && (isAdmin() || getUserData().role == 'content_creator');
     }
 
     function incoming() {
@@ -43,7 +55,7 @@ service cloud.firestore {
                data.keys().size() <= 7 &&
                data.uid == request.auth.uid &&
                data.email is string && data.email.size() <= 256 &&
-               data.role in ['admin', 'user'] &&
+               data.role in ['admin', 'moderator', 'content_creator', 'user'] &&
                data.createdAt is timestamp &&
                data.updatedAt is timestamp;
       }
@@ -61,41 +73,67 @@ service cloud.firestore {
     // POSTS
     match /posts/{postId} {
       function isValidPost(data) {
-        return data.keys().hasAll(['title', 'slug', 'content', 'authorId', 'published', 'createdAt']) &&
+        return data.keys().hasAll(['title', 'slug', 'content', 'excerpt', 'coverImage', 'authorId', 'category', 'published', 'createdAt', 'updatedAt']) &&
                data.title is string && data.title.size() <= 200 &&
                data.slug is string && data.slug.size() <= 200 &&
                data.content is string && data.content.size() <= 100000 &&
+               data.excerpt is string && data.excerpt.size() <= 1000 &&
+               data.coverImage is string && data.coverImage.size() <= 2000 &&
                data.authorId == request.auth.uid &&
+               data.category is string &&
                data.published is bool &&
-               data.createdAt is timestamp;
+               data.createdAt is timestamp &&
+               data.updatedAt is timestamp;
       }
 
-      allow read: if incoming().published == true || isAdmin() || (isSignedIn() && existing().published == true);
-      allow list: if (resource.data.published == true) || isAdmin();
-      allow create: if isAdmin() && isValidPost(incoming());
-      allow update: if isAdmin() && (
-        incoming().diff(existing()).affectedKeys().hasAny(['title', 'content', 'published', 'updatedAt']) &&
-        incoming().updatedAt == request.time
-      );
-      allow delete: if isAdmin();
+      allow read, list: if (resource.data.published == true) || isModerator() || isContentCreator();
+      allow create: if isContentCreator() && isValidPost(incoming());
+      allow update: if (isContentCreator() && isValidPost(incoming())) || isModerator();
+      allow delete: if isAdmin() || (isModerator() && existing().published == false);
     }
 
     // BOOKS
     match /books/{bookId} {
       function isValidBook(data) {
-        return data.keys().hasAll(['title', 'description', 'price', 'published', 'createdAt']) &&
+        return data.keys().hasAll(['title', 'description', 'price', 'currency', 'coverImage', 'storeUrl', 'published', 'order', 'createdAt']) &&
+               data.title is string && data.title.size() <= 200 &&
+               data.description is string && data.description.size() <= 5000 &&
+               data.price is number &&
+               data.currency is string &&
+               data.coverImage is string &&
+               data.storeUrl is string &&
+               data.published is bool &&
+               data.order is number &&
+               data.createdAt is timestamp;
+      }
+
+      allow read, list: if existing().published == true || isAdmin();
+      allow create: if isAdmin() && isValidBook(incoming());
+      allow update: if isAdmin() && isValidBook(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // PURCHASES
+    match /purchases/{purchaseId} {
+      allow read, list: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAdmin(); // Only system/admin can record purchases
+    }
+
+    // RESOURCES
+    match /resources/{resourceId} {
+      function isValidResource(data) {
+        return data.keys().hasAll(['title', 'description', 'type', 'fileUrl', 'isFree', 'published', 'createdAt']) &&
                data.title is string && data.title.size() <= 200 &&
                data.description is string && data.description.size() <= 2000 &&
-               data.price is number && data.price >= 0 &&
+               data.type in ['pdf', 'guide', 'checklist', 'infographic'] &&
+               data.fileUrl is string && data.fileUrl.size() <= 2000 &&
+               data.isFree is bool &&
                data.published is bool &&
                data.createdAt is timestamp;
       }
 
-      allow read: if existing().published == true || isAdmin();
-      allow list: if resource.data.published == true || isAdmin();
-      allow create: if isAdmin() && isValidBook(incoming());
-      allow update: if isAdmin() && isValidBook(incoming());
-      allow delete: if isAdmin();
+      allow read, list: if existing().published == true || isAdmin();
+      allow create, update, delete: if isAdmin() && isValidResource(incoming());
     }
   }
 }

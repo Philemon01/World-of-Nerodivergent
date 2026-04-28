@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { Post, getPublishedPosts } from '../lib/services';
 import { Calendar, ArrowRight, Newspaper } from 'lucide-react';
 
@@ -98,13 +99,13 @@ export default function BlogSection() {
                   {post.excerpt}
                 </p>
                 <div className="mt-auto">
-                  <a 
-                    href={`/blog/${post.slug}`}
+                  <Link 
+                    to={`/blog/${post.slug}`}
                     className="inline-flex items-center gap-2 font-bold text-brand-dark hover:text-rainbow-blue transition-colors group/link"
                   >
                     Read Article 
                     <ArrowRight size={18} className="group-hover/link:translate-x-1 transition-transform" />
-                  </a>
+                  </Link>
                 </div>
               </div>
             </motion.article>
