@@ -14,9 +14,9 @@ import {
   Timestamp,
   serverTimestamp 
 } from 'firebase/firestore';
-import { User } from 'firebase/auth';
+import { User, sendPasswordResetEmail } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage, handleFirestoreError, OperationType } from './firebase';
+import { db, storage, auth, handleFirestoreError, OperationType } from './firebase';
 
 // --- Storage ---
 
@@ -36,8 +36,10 @@ export interface UserProfile {
   email: string;
   displayName: string;
   photoURL: string;
+  bio?: string;
   role: 'admin' | 'moderator' | 'content_creator' | 'user';
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 export interface Purchase {
@@ -71,6 +73,23 @@ export const syncUserProfile = async (user: User) => {
   }
 };
 
+export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
+  const path = `users/${uid}`;
+  try {
+    const docSnap = await getDoc(doc(db, 'users', uid));
+    if (!docSnap.exists()) return null;
+    const data = docSnap.data();
+    return {
+      ...data,
+      createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
+      updatedAt: (data.updatedAt as Timestamp)?.toDate() || undefined
+    } as UserProfile;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, path);
+    return null;
+  }
+};
+
 
 export interface Post {
   id?: string;
@@ -90,6 +109,7 @@ export interface Book {
   id?: string;
   title: string;
   description: string;
+  author: string;
   price: number;
   currency: string;
   coverImage: string;
@@ -110,6 +130,28 @@ export interface Resource {
   published: boolean;
   createdAt?: Date;
 }
+
+export const updateUserProfile = async (uid: string, data: Partial<UserProfile>) => {
+  const path = `users/${uid}`;
+  try {
+    const docRef = doc(db, 'users', uid);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+};
+
+export const sendPasswordRest = async (email: string) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+  } catch (error) {
+    console.error('Password reset failed:', error);
+    throw error;
+  }
+};
 
 // --- Posts ---
 

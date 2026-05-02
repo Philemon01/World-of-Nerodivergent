@@ -38,6 +38,7 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
   const [bookData, setBookData] = useState({
     title: '',
     description: '',
+    author: '',
     price: 0,
     currency: '£',
     coverImage: '',
@@ -186,6 +187,7 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
       setBookData({
         title: item.title,
         description: item.description,
+        author: item.author,
         price: item.price,
         currency: item.currency,
         coverImage: item.coverImage,
@@ -210,7 +212,7 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
   const resetForms = () => {
     setEditingId(null);
     setPostData({ title: '', slug: '', content: '', excerpt: '', coverImage: '', category: 'Education', published: true });
-    setBookData({ title: '', description: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
+    setBookData({ title: '', description: '', author: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
     setResourceData({ title: '', description: '', type: 'pdf', fileUrl: '', isFree: true, published: true });
   };
 
@@ -414,6 +416,18 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
                             placeholder="Resource name..."
                           />
                         </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-slate-600 ml-2">Author</label>
+                          <input 
+                            required
+                            value={bookData.author}
+                            onChange={e => setBookData({...bookData, author: e.target.value})}
+                            className="w-full px-6 py-3 rounded-xl border border-slate-200 focus:border-rainbow-orange outline-none transition-all font-medium"
+                            placeholder="Author name..."
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <label className="text-sm font-bold text-slate-600 ml-2">Cover Image</label>
                            <div className="flex gap-2">

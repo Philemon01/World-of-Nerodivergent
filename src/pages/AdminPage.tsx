@@ -32,7 +32,7 @@ export default function AdminPage() {
 
   // Form States
   const [postData, setPostData] = useState({ title: '', slug: '', content: '', excerpt: '', coverImage: '', category: 'Education', published: true });
-  const [bookData, setBookData] = useState({ title: '', description: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
+  const [bookData, setBookData] = useState({ title: '', description: '', author: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
   const [resourceData, setResourceData] = useState({ title: '', description: '', type: 'pdf' as any, fileUrl: '', isFree: true, published: true });
 
   const fetchData = async () => {
@@ -142,7 +142,7 @@ export default function AdminPage() {
       setPostData({ title: item.title, slug: item.slug, content: item.content, excerpt: item.excerpt, coverImage: item.coverImage, category: item.category, published: item.published });
       setActiveTab('posts');
     } else if (type === 'books') {
-      setBookData({ title: item.title, description: item.description, price: item.price, currency: item.currency, coverImage: item.coverImage, storeUrl: item.storeUrl, published: item.published, order: item.order });
+      setBookData({ title: item.title, description: item.description, author: item.author, price: item.price, currency: item.currency, coverImage: item.coverImage, storeUrl: item.storeUrl, published: item.published, order: item.order });
       setActiveTab('books');
     } else if (type === 'resources') {
       setResourceData({ title: item.title, description: item.description, type: item.type, fileUrl: item.fileUrl, isFree: item.isFree, published: item.published });
@@ -154,7 +154,7 @@ export default function AdminPage() {
   const resetForms = () => {
     setEditingId(null);
     setPostData({ title: '', slug: '', content: '', excerpt: '', coverImage: '', category: 'Education', published: true });
-    setBookData({ title: '', description: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
+    setBookData({ title: '', description: '', author: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
     setResourceData({ title: '', description: '', type: 'pdf', fileUrl: '', isFree: true, published: true });
   };
 

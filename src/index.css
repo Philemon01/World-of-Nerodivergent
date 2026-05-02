@@ -1,25 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-brand-cream: #FAF7F0;
+  --color-brand-yellow: #FFD966;
   --color-brand-primary: #026ca3;
   --color-brand-secondary: #f0f9ff;
-  --color-brand-dark: #0f172a;
+  --color-brand-dark: #1A1A1A;
   
-  /* Rainbow Palette */
-  --color-rainbow-red: #ef4444;
-  --color-rainbow-orange: #f97316;
-  --color-rainbow-yellow: #facc15;
-  --color-rainbow-green: #22c55e;
-  --color-rainbow-blue: #3b82f6;
-  --color-rainbow-indigo: #6366f1;
-  --color-rainbow-violet: #a855f7;
+  /* Rainbow Palette Updated to match the soft tone */
+  --color-rainbow-red: #FF6666;
+  --color-rainbow-orange: #FFB366;
+  --color-rainbow-yellow: #FFD966;
+  --color-rainbow-green: #B3FF66;
+  --color-rainbow-blue: #66B3FF;
+  --color-rainbow-indigo: #6666FF;
+  --color-rainbow-violet: #B366FF;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-white text-slate-900 antialiased;
+    @apply font-body bg-white text-brand-dark antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans;
   }
 }
 
