@@ -29,6 +29,10 @@ export default function Navigation() {
     { name: 'About', href: '/#founder' },
   ];
 
+  if (isAdmin) {
+    navLinks.push({ name: 'Admin', href: '/admin' });
+  }
+
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -45,15 +49,25 @@ export default function Navigation() {
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center gap-10">
+        <div className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href}
-              className="text-sm font-bold text-brand-dark transition-colors hover:text-rainbow-orange"
-            >
-              {link.name}
-            </a>
+            link.href.startsWith('/#') ? (
+              <a 
+                key={link.name} 
+                href={link.href}
+                className="text-sm font-bold text-brand-dark transition-colors hover:text-rainbow-orange"
+              >
+                {link.name}
+              </a>
+            ) : (
+              <Link
+                key={link.name}
+                to={link.href}
+                className={`text-sm font-bold transition-colors ${link.name === 'Admin' ? 'text-rainbow-blue' : 'text-brand-dark'} hover:text-rainbow-orange`}
+              >
+                {link.name}
+              </Link>
+            )
           ))}
         </div>
 

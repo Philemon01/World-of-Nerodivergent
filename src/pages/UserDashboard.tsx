@@ -112,6 +112,14 @@ export default function UserDashboard() {
             </div>
 
             <div className="flex flex-col gap-3 shrink-0">
+               {isAdmin && (
+                 <button 
+                  onClick={() => navigate('/admin')}
+                  className="px-8 py-4 bg-rainbow-blue text-white rounded-2xl font-black shadow-xl shadow-rainbow-blue/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                 >
+                   <Settings size={18} /> Admin Dashboard
+                 </button>
+               )}
                <button 
                 onClick={() => setActiveTab('profile')}
                 className="px-8 py-4 bg-white text-brand-dark rounded-2xl font-black shadow-xl shadow-white/5 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
