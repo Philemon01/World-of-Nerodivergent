@@ -21,6 +21,7 @@ import { db, storage, auth, handleFirestoreError, OperationType } from './fireba
 // --- Storage ---
 
 export const uploadFile = async (file: File, folder: string): Promise<string> => {
+  if (!storage) return '';
   try {
     const fileRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
     const snapshot = await uploadBytes(fileRef, file);
@@ -55,6 +56,7 @@ export interface Purchase {
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'progressphilemon@gmail.com';
 
 export const syncUserProfile = async (user: User) => {
+  if (!db) return;
   const path = `users/${user.uid}`;
   const userDocRef = doc(db, 'users', user.uid);
   try {
@@ -76,6 +78,7 @@ export const syncUserProfile = async (user: User) => {
 };
 
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
+  if (!db) return null;
   const path = `users/${uid}`;
   try {
     const docSnap = await getDoc(doc(db, 'users', uid));
@@ -123,6 +126,7 @@ export interface Book {
 }
 
 export const updateUserProfile = async (uid: string, data: Partial<UserProfile>) => {
+  if (!db) return;
   const path = `users/${uid}`;
   try {
     const docRef = doc(db, 'users', uid);
@@ -136,6 +140,7 @@ export const updateUserProfile = async (uid: string, data: Partial<UserProfile>)
 };
 
 export const sendPasswordRest = async (email: string) => {
+  if (!auth) return;
   try {
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
@@ -147,6 +152,7 @@ export const sendPasswordRest = async (email: string) => {
 // --- Posts ---
 
 export const getPublishedPosts = async (limitCount = 10): Promise<Post[]> => {
+  if (!db) return [];
   const path = 'posts';
   try {
     const q = query(
@@ -168,6 +174,7 @@ export const getPublishedPosts = async (limitCount = 10): Promise<Post[]> => {
 };
 
 export const createPost = async (post: Omit<Post, 'id' | 'createdAt'>) => {
+  if (!db) return;
   const path = 'posts';
   try {
     return await addDoc(collection(db, path), {
@@ -181,6 +188,7 @@ export const createPost = async (post: Omit<Post, 'id' | 'createdAt'>) => {
 };
 
 export const updatePost = async (id: string, post: Partial<Post>) => {
+  if (!db) return;
   const path = `posts/${id}`;
   try {
     const docRef = doc(db, 'posts', id);
@@ -194,6 +202,7 @@ export const updatePost = async (id: string, post: Partial<Post>) => {
 };
 
 export const deletePost = async (id: string) => {
+  if (!db) return;
   const path = `posts/${id}`;
   try {
     const docRef = doc(db, 'posts', id);
@@ -204,6 +213,7 @@ export const deletePost = async (id: string) => {
 };
 
 export const getAllPosts = async (): Promise<Post[]> => {
+  if (!db) return [];
   const path = 'posts';
   try {
     const q = query(collection(db, path), orderBy('createdAt', 'desc'));
@@ -220,6 +230,7 @@ export const getAllPosts = async (): Promise<Post[]> => {
 };
 
 export const getPostBySlug = async (slug: string): Promise<Post | null> => {
+  if (!db) return null;
   const path = 'posts';
   try {
     const q = query(
@@ -244,6 +255,7 @@ export const getPostBySlug = async (slug: string): Promise<Post | null> => {
 // --- Books ---
 
 export const getPublishedBooks = async (): Promise<Book[]> => {
+  if (!db) return [];
   const path = 'books';
   try {
     const q = query(
@@ -264,6 +276,7 @@ export const getPublishedBooks = async (): Promise<Book[]> => {
 };
 
 export const createBook = async (book: Omit<Book, 'id' | 'createdAt'>) => {
+  if (!db) return;
   const path = 'books';
   try {
     return await addDoc(collection(db, path), {
@@ -276,6 +289,7 @@ export const createBook = async (book: Omit<Book, 'id' | 'createdAt'>) => {
 };
 
 export const updateBook = async (id: string, book: Partial<Book>) => {
+  if (!db) return;
   const path = `books/${id}`;
   try {
     const docRef = doc(db, 'books', id);
@@ -286,6 +300,7 @@ export const updateBook = async (id: string, book: Partial<Book>) => {
 };
 
 export const deleteBook = async (id: string) => {
+  if (!db) return;
   const path = `books/${id}`;
   try {
     const docRef = doc(db, 'books', id);
@@ -296,6 +311,7 @@ export const deleteBook = async (id: string) => {
 };
 
 export const getAllBooks = async (): Promise<Book[]> => {
+  if (!db) return [];
   const path = 'books';
   try {
     const q = query(collection(db, path), orderBy('order', 'asc'));
@@ -314,6 +330,7 @@ export const getAllBooks = async (): Promise<Book[]> => {
 // --- Purchases ---
 
 export const getUserPurchases = async (userId: string): Promise<Purchase[]> => {
+  if (!db) return [];
   const path = 'purchases';
   try {
     const q = query(collection(db, path), where('userId', '==', userId));
@@ -330,6 +347,7 @@ export const getUserPurchases = async (userId: string): Promise<Purchase[]> => {
 };
 
 export const getBookById = async (id: string): Promise<Book | null> => {
+  if (!db) return null;
   const path = `books/${id}`;
   try {
     const docSnap = await getDoc(doc(db, 'books', id));

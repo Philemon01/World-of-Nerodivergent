@@ -16,16 +16,23 @@ const firebaseConfig = {
 };
 
 // Check if we have the minimum required config
-const isConfigValid = firebaseConfig.apiKey && firebaseConfig.projectId;
+const isConfigValid = !!firebaseConfig.apiKey && !!firebaseConfig.projectId;
 
-if (!isConfigValid) {
-  console.warn('Firebase configuration is incomplete. Authentication and Database features will likely fail until VITE_FIREBASE_* environment variables are set.');
+let app;
+if (isConfigValid) {
+  try {
+    app = initializeApp(firebaseConfig);
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+  }
+} else {
+  console.warn('Firebase configuration is missing or incomplete. Authentication and Database features will not work until VITE_FIREBASE_* environment variables are set in your project settings.');
 }
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || '(default)');
-export const storage = getStorage(app);
-export const auth = getAuth(app);
+// Export services with fallback or null if not initialized
+export const db = app ? getFirestore(app, import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || '(default)') : null as any;
+export const storage = app ? getStorage(app) : null as any;
+export const auth = app ? getAuth(app) : null as any;
 
 export enum OperationType {
   CREATE = 'create',
