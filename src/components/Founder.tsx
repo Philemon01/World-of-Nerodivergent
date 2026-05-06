@@ -19,9 +19,9 @@ export default function Founder() {
             <div className="relative p-1 rounded-[2rem] bg-rainbow-gradient">
               <div className="aspect-square rounded-[1.8rem] overflow-hidden bg-brand-dark">
                 <img 
-                  src="/input_file_0.png" 
+                  src="/founder.png" 
                   alt="Gauri Thakkar"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
               </div>
