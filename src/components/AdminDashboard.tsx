@@ -5,11 +5,10 @@ import { useAuth } from '../lib/AuthContext';
 import { 
   createPost, updatePost, deletePost, getAllPosts, 
   createBook, updateBook, deleteBook, getAllBooks,
-  createResource, updateResource, deleteResource, getAllResources,
-  uploadFile, Post, Book, Resource 
+  uploadFile, Post, Book 
 } from '../lib/services';
 
-type Tab = 'posts' | 'books' | 'resources';
+type Tab = 'posts' | 'books';
 
 export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const { user, isAdmin } = useAuth();
@@ -21,7 +20,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
   // Lists
   const [posts, setPosts] = useState<Post[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
 
   // Post State
   const [postData, setPostData] = useState({
@@ -47,26 +45,14 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
     order: 0
   });
 
-  // Resource State
-  const [resourceData, setResourceData] = useState({
-    title: '',
-    description: '',
-    type: 'pdf' as 'pdf' | 'guide' | 'checklist' | 'infographic',
-    fileUrl: '',
-    isFree: true,
-    published: true
-  });
-
   const fetchData = async () => {
     if (!isAdmin) return;
-    const [p, b, r] = await Promise.all([
+    const [p, b] = await Promise.all([
       getAllPosts(),
-      getAllBooks(),
-      getAllResources()
+      getAllBooks()
     ]);
     setPosts(p);
     setBooks(b);
-    setResources(r);
   };
 
   useEffect(() => {
@@ -84,7 +70,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
       const url = await uploadFile(file, folder);
       if (target === 'post') setPostData({ ...postData, coverImage: url });
       if (target === 'book') setBookData({ ...bookData, coverImage: url });
-      if (target === 'resource') setResourceData({ ...resourceData, fileUrl: url });
     } catch (err) {
       console.error(err);
     } finally {
@@ -134,34 +119,12 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
     }
   };
 
-  const handleResourceSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !isAdmin) return;
-    setLoading(true);
-    try {
-      if (editingId) {
-        await updateResource(editingId, resourceData);
-      } else {
-        await createResource(resourceData);
-      }
-      setSuccess(true);
-      resetForms();
-      fetchData();
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDelete = async (id: string, type: Tab) => {
     if (!window.confirm('Are you sure you want to delete this?')) return;
     setLoading(true);
     try {
       if (type === 'posts') await deletePost(id);
       if (type === 'books') await deleteBook(id);
-      if (type === 'resources') await deleteResource(id);
       fetchData();
     } catch (err) {
       console.error(err);
@@ -196,16 +159,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
         order: item.order
       });
       setActiveTab('books');
-    } else if (type === 'resources') {
-      setResourceData({
-        title: item.title,
-        description: item.description,
-        type: item.type,
-        fileUrl: item.fileUrl,
-        isFree: item.isFree,
-        published: item.published
-      });
-      setActiveTab('resources');
     }
   };
 
@@ -213,7 +166,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
     setEditingId(null);
     setPostData({ title: '', slug: '', content: '', excerpt: '', coverImage: '', category: 'Education', published: true });
     setBookData({ title: '', description: '', author: '', price: 0, currency: '£', coverImage: '', storeUrl: '', published: true, order: 0 });
-    setResourceData({ title: '', description: '', type: 'pdf', fileUrl: '', isFree: true, published: true });
   };
 
   if (!isAdmin) return null;
@@ -266,15 +218,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
               >
                 <BookIcon size={18} />
                 Books
-              </button>
-              <button 
-                onClick={() => { setActiveTab('resources'); resetForms(); }}
-                className={`px-6 py-3 rounded-t-2xl font-bold flex items-center gap-2 transition-all ${
-                  activeTab === 'resources' ? 'bg-white text-rainbow-green shadow-sm' : 'text-slate-400 hover:text-brand-dark'
-                }`}
-              >
-                <FileText size={18} />
-                Resources
               </button>
             </div>
 
@@ -518,94 +461,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
                       </button>
                     </form>
                   )}
-
-                  {activeTab === 'resources' && (
-                    <form onSubmit={handleResourceSubmit} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-sm font-bold text-slate-600 ml-2">Resource Title</label>
-                          <input 
-                            required
-                            value={resourceData.title}
-                            onChange={e => setResourceData({...resourceData, title: e.target.value})}
-                            className="w-full px-6 py-3 rounded-xl border border-slate-200 focus:border-rainbow-green outline-none transition-all font-medium"
-                            placeholder="Resource name..."
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-bold text-slate-600 ml-2">Type</label>
-                          <select 
-                            value={resourceData.type}
-                            onChange={e => setResourceData({...resourceData, type: e.target.value as any})}
-                            className="w-full px-6 py-3 rounded-xl border border-slate-200 focus:border-rainbow-green outline-none transition-all font-bold text-slate-600"
-                          >
-                            <option value="pdf">PDF Document</option>
-                            <option value="guide">Guide Book</option>
-                            <option value="checklist">Checklist</option>
-                            <option value="infographic">Infographic</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-600 ml-2">Description</label>
-                        <textarea 
-                          required
-                          value={resourceData.description}
-                          onChange={e => setResourceData({...resourceData, description: e.target.value})}
-                          className="w-full px-6 py-3 rounded-xl border border-slate-200 focus:border-rainbow-green outline-none transition-all font-medium h-24"
-                          placeholder="What is this resource for?"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-600 ml-2">File / Asset</label>
-                        <div className="flex gap-2">
-                          <input 
-                            required
-                            value={resourceData.fileUrl}
-                            onChange={e => setResourceData({...resourceData, fileUrl: e.target.value})}
-                            className="flex-grow px-6 py-3 rounded-xl border border-slate-200 focus:border-rainbow-green outline-none transition-all font-medium"
-                            placeholder="Upload file or URL..."
-                          />
-                          <label className="w-12 h-12 flex-shrink-0 bg-slate-100 rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors">
-                            <Upload size={18} className="text-slate-500" />
-                            <input type="file" className="hidden" onChange={e => handleFileUpload(e, 'resources', 'resource')} />
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center gap-4 py-4 px-2">
-                          <input 
-                            type="checkbox" 
-                            id="res-free"
-                            checked={resourceData.isFree} 
-                            onChange={e => setResourceData({...resourceData, isFree: e.target.checked})}
-                            className="w-6 h-6 rounded-lg text-rainbow-green focus:ring-rainbow-green"
-                          />
-                          <label htmlFor="res-free" className="font-bold text-slate-700">Free download?</label>
-                        </div>
-                         <div className="flex items-center gap-4 py-4 px-2">
-                          <input 
-                            type="checkbox" 
-                            id="res-published"
-                            checked={resourceData.published} 
-                            onChange={e => setResourceData({...resourceData, published: e.target.checked})}
-                            className="w-6 h-6 rounded-lg text-rainbow-green focus:ring-rainbow-green"
-                          />
-                          <label htmlFor="res-published" className="font-bold text-slate-700">Published?</label>
-                        </div>
-                      </div>
-
-                      <button 
-                        disabled={loading}
-                        className="w-full bg-rainbow-green text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-rainbow-green/20 hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        {loading ? 'Processing...' : <><Save size={20} /> {editingId ? 'Update Resource' : 'Add Resource'}</>}
-                      </button>
-                    </form>
-                  )}
                 </div>
 
                 {/* List Side */}
@@ -641,24 +496,6 @@ export default function AdminDashboard({ isOpen, onClose }: { isOpen: boolean, o
                             <Edit3 size={18} />
                           </button>
                           <button onClick={() => handleDelete(book.id!, 'books')} className="p-2 text-slate-400 hover:text-rainbow-red transition-colors">
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    {activeTab === 'resources' && resources.map(res => (
-                      <div key={res.id} className="p-4 rounded-2xl border border-slate-100 bg-slate-50 flex items-center justify-between">
-                         <div className="flex-grow min-w-0 pr-4">
-                          <h4 className="font-bold text-brand-dark truncate">{res.title}</h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 uppercase">
-                            {res.type}
-                          </span>
-                        </div>
-                        <div className="flex gap-1">
-                          <button onClick={() => startEdit(res, 'resources')} className="p-2 text-slate-400 hover:text-rainbow-green transition-colors">
-                            <Edit3 size={18} />
-                          </button>
-                          <button onClick={() => handleDelete(res.id!, 'resources')} className="p-2 text-slate-400 hover:text-rainbow-red transition-colors">
                             <Trash2 size={18} />
                           </button>
                         </div>

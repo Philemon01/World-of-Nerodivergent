@@ -24,7 +24,6 @@ export default function Navigation() {
     { name: 'Home', href: '/' },
     { name: 'Insights', href: '/#blog' },
     { name: 'Books', href: '/#books' },
-    { name: 'Resources', href: '/#resources' },
     { name: 'Principles', href: '/#rules' },
     { name: 'About', href: '/#founder' },
   ];
@@ -36,26 +35,26 @@ export default function Navigation() {
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/80 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-8'
+        isScrolled ? 'bg-white/80 backdrop-blur-md py-3 shadow-sm' : 'bg-transparent py-6'
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-black text-brand-dark tracking-tighter flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-lg bg-rainbow-gradient group-hover:rotate-12 transition-transform shadow-lg" />
+        <Link to="/" className="text-lg font-black text-brand-dark tracking-tighter flex items-center gap-2 group">
+          <div className="w-6 h-6 rounded-lg bg-rainbow-gradient group-hover:rotate-12 transition-transform shadow-md" />
           <span>
             World of <span className="text-rainbow-blue">Neurodivergent</span>
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-5">
           {navLinks.map((link) => (
             link.href.startsWith('/#') ? (
               <a 
                 key={link.name} 
                 href={link.href}
-                className="text-sm font-bold text-brand-dark transition-colors hover:text-rainbow-orange"
+                className="text-[13px] font-bold text-brand-dark transition-colors hover:text-rainbow-orange"
               >
                 {link.name}
               </a>
@@ -63,7 +62,7 @@ export default function Navigation() {
               <Link
                 key={link.name}
                 to={link.href}
-                className={`text-sm font-bold transition-colors ${link.name === 'Admin' ? 'text-rainbow-blue' : 'text-brand-dark'} hover:text-rainbow-orange`}
+                className={`text-[13px] font-bold transition-colors ${link.name === 'Admin' ? 'text-rainbow-blue' : 'text-brand-dark'} hover:text-rainbow-orange`}
               >
                 {link.name}
               </Link>
@@ -72,16 +71,16 @@ export default function Navigation() {
         </div>
 
         {/* Icons Area */}
-        <div className="hidden lg:flex items-center gap-6 text-brand-dark/60">
-          <button className="hover:text-brand-dark transition-colors"><Search size={20} /></button>
+        <div className="hidden lg:flex items-center gap-5 text-brand-dark/60">
+          <button className="hover:text-brand-dark transition-colors"><Search size={18} /></button>
           <Link to={user ? "/dashboard" : "/login"} className="hover:text-brand-dark transition-colors">
-            <User size={20} />
+            <User size={18} />
           </Link>
           <div className="flex items-center gap-2">
             <AccessibilityPanel />
             {isAdmin && (
               <Link to="/admin" className="hover:text-brand-dark transition-colors">
-                <SettingsIcon size={20} />
+                <SettingsIcon size={18} />
               </Link>
             )}
           </div>

@@ -12,6 +12,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({ user: null, profile: null, loading: true, isAdmin: false });
 
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'progressphilemon@gmail.com';
+
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -27,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await syncUserProfile(authUser);
         const userProfile = await getUserProfile(authUser.uid);
         setProfile(userProfile);
-        setIsAdmin(userProfile?.role === 'admin' || authUser.email === 'progressphilemon@gmail.com');
+        setIsAdmin(userProfile?.role === 'admin' || authUser.email === ADMIN_EMAIL);
       } else {
         setProfile(null);
         setIsAdmin(false);

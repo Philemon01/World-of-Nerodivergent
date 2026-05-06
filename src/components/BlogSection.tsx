@@ -27,10 +27,10 @@ export default function BlogSection() {
 
   if (loading) {
     return (
-      <section id="blog" className="py-24 bg-white">
+      <section id="blog" className="py-16 bg-white">
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
           {[1, 2, 3].map(i => (
-            <div key={i} className="animate-pulse bg-slate-50 h-96 rounded-[3rem]" />
+            <div key={i} className="animate-pulse bg-slate-50 h-80 rounded-[2rem]" />
           ))}
         </div>
       </section>
@@ -38,22 +38,22 @@ export default function BlogSection() {
   }
 
   return (
-    <section id="blog" className="py-24 bg-white scroll-mt-20">
+    <section id="blog" className="py-16 bg-white scroll-mt-20">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 text-center md:text-left">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10 text-center md:text-left">
           <div className="max-w-2xl">
-            <span className="text-rainbow-orange font-black tracking-[0.2em] uppercase text-xs mb-4 block">Advocacy & Updates</span>
-            <h2 className="text-4xl md:text-6xl font-black text-brand-dark mb-6 leading-tight">Latest from the <span className="text-rainbow-blue">Community.</span></h2>
-            <p className="text-slate-600 text-xl font-medium">
+            <span className="text-rainbow-orange font-black tracking-[0.15em] uppercase text-[9px] mb-2 block">Advocacy & Updates</span>
+            <h2 className="text-2xl md:text-3xl font-black text-brand-dark mb-3 leading-tight">Latest from the <span className="text-rainbow-blue">Community.</span></h2>
+            <p className="text-slate-600 text-base font-medium">
               Stay informed with our latest research, personal stories, and educational strategies to support neurodivergent individuals.
             </p>
           </div>
-          <button className="hidden md:flex items-center gap-2 font-black text-xs text-brand-dark hover:text-rainbow-blue transition-colors group tracking-widest uppercase">
-            View All Posts <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          <button className="hidden md:flex items-center gap-2 font-black text-[9px] text-brand-dark hover:text-rainbow-blue transition-colors group tracking-widest uppercase">
+            View All Posts <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post, index) => (
             <motion.article
               key={post.id}
@@ -63,7 +63,7 @@ export default function BlogSection() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="flex flex-col group"
             >
-              <Link to={`/blog/${post.slug}`} className="rounded-[2.5rem] overflow-hidden aspect-[16/10] mb-6">
+              <Link to={`/blog/${post.slug}`} className="rounded-[2rem] overflow-hidden aspect-[3/2] mb-5">
                 <img 
                   src={post.coverImage || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800'} 
                   alt={post.title}
@@ -72,18 +72,18 @@ export default function BlogSection() {
                 />
               </Link>
               
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <div>
-                   <span className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${CATEGORY_COLORS[post.category || 'General'] || CATEGORY_COLORS['General']}`}>
+                   <span className={`px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${CATEGORY_COLORS[post.category || 'General'] || CATEGORY_COLORS['General']}`}>
                      {post.category || 'Tips'}
                    </span>
                 </div>
                 <Link to={`/blog/${post.slug}`}>
-                  <h3 className="text-xl font-black text-brand-dark mb-2 leading-tight group-hover:text-rainbow-blue transition-colors">
+                  <h3 className="text-lg font-black text-brand-dark mb-1 leading-tight group-hover:text-rainbow-blue transition-colors">
                     {post.title}
                   </h3>
                 </Link>
-                <p className="text-sm font-medium text-slate-500 line-clamp-3 leading-relaxed">
+                <p className="text-[13px] font-medium text-slate-500 line-clamp-3 leading-relaxed">
                   {post.excerpt || 'Empowering insights and community stories shared for neurodivergent minds and their champions.'}
                 </p>
               </div>

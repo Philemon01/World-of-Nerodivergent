@@ -5,6 +5,8 @@ import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 import { LogIn, Mail, Lock, Chrome, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'progressphilemon@gmail.com';
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ export default function Login() {
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      if (email === 'progressphilemon@gmail.com') {
+      if (email === ADMIN_EMAIL) {
         navigate('/admin');
       } else {
         navigate('/dashboard');
@@ -55,7 +57,7 @@ export default function Login() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      if (result.user.email === 'progressphilemon@gmail.com') {
+      if (result.user.email === ADMIN_EMAIL) {
         navigate('/admin');
       } else {
         navigate('/dashboard');

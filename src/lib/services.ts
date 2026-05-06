@@ -46,11 +46,13 @@ export interface Purchase {
   id?: string;
   userId: string;
   itemId: string;
-  itemType: 'book' | 'resource';
+  itemType: 'book';
   purchaseDate: Date;
 }
 
 // --- Users ---
+
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'progressphilemon@gmail.com';
 
 export const syncUserProfile = async (user: User) => {
   const path = `users/${user.uid}`;
@@ -63,7 +65,7 @@ export const syncUserProfile = async (user: User) => {
         email: user.email,
         displayName: user.displayName || '',
         photoURL: user.photoURL || '',
-        role: user.email === 'progressphilemon@gmail.com' ? 'admin' : 'user',
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -117,17 +119,6 @@ export interface Book {
   storeUrl: string;
   published: boolean;
   order: number;
-  createdAt?: Date;
-}
-
-export interface Resource {
-  id?: string;
-  title: string;
-  description: string;
-  type: 'pdf' | 'guide' | 'checklist' | 'infographic';
-  fileUrl: string;
-  isFree: boolean;
-  published: boolean;
   createdAt?: Date;
 }
 
@@ -314,76 +305,6 @@ export const getAllBooks = async (): Promise<Book[]> => {
       ...doc.data(),
       createdAt: (doc.data().createdAt as Timestamp)?.toDate() || new Date()
     } as Book));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.LIST, path);
-    return [];
-  }
-};
-
-// --- Resources ---
-
-export const getPublishedResources = async (): Promise<Resource[]> => {
-  const path = 'resources';
-  try {
-    const q = query(
-      collection(db, path),
-      where('published', '==', true),
-      orderBy('createdAt', 'desc')
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: (doc.data().createdAt as Timestamp)?.toDate() || new Date()
-    } as Resource));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.LIST, path);
-    return [];
-  }
-};
-
-export const createResource = async (resource: Omit<Resource, 'id' | 'createdAt'>) => {
-  const path = 'resources';
-  try {
-    return await addDoc(collection(db, path), {
-      ...resource,
-      createdAt: serverTimestamp()
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.CREATE, path);
-  }
-};
-
-export const updateResource = async (id: string, resource: Partial<Resource>) => {
-  const path = `resources/${id}`;
-  try {
-    const docRef = doc(db, 'resources', id);
-    await updateDoc(docRef, resource);
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
-  }
-};
-
-export const deleteResource = async (id: string) => {
-  const path = `resources/${id}`;
-  try {
-    const docRef = doc(db, 'resources', id);
-    await deleteDoc(docRef);
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
-  }
-};
-
-export const getAllResources = async (): Promise<Resource[]> => {
-  const path = 'resources';
-  try {
-    const q = query(collection(db, path), orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: (doc.data().createdAt as Timestamp)?.toDate() || new Date()
-    } as Resource));
   } catch (error) {
     handleFirestoreError(error, OperationType.LIST, path);
     return [];
